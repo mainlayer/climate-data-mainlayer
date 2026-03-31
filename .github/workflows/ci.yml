@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        working-directory: mainlayer-other/tier4-data/climate-data-mainlayer
+        run: uv pip install --system -e ".[dev]"
+
+      - name: Lint
+        working-directory: mainlayer-other/tier4-data/climate-data-mainlayer
+        run: ruff check src tests
+
+      - name: Test
+        working-directory: mainlayer-other/tier4-data/climate-data-mainlayer
+        run: pytest tests/ -v --tb=short
+        env:
+          MAINLAYER_DEV_MODE: "true"
