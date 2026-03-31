@@ -1,67 +1,64 @@
-# Climate Data Mainlayer
+# climate-data-mainlayer
 
-Climate and weather data sold to AI agents via [Mainlayer](https://mainlayer.fr) payment infrastructure.
+Climate, weather, and carbon data sold to AI agents per query via [Mainlayer](https://mainlayer.fr).
 
-## Endpoints
+## Overview
 
-| Method | Path | Price | Description |
-|--------|------|-------|-------------|
-| GET | `/weather/current?city=` | $0.001 | Current conditions |
-| GET | `/weather/forecast?city=&days=` | $0.003 | Multi-day forecast |
-| GET | `/weather/history?city=&date=` | $0.005 | Historical data |
-| GET | `/climate/monthly?city=` | $0.002 | Monthly climate averages |
-| GET | `/alerts?region=` | $0.001 | Active weather alerts |
-| GET | `/carbon/footprint?lat=&lon=` | $0.002 | Grid carbon intensity |
-| GET | `/health` | free | Health check |
+Comprehensive climate API: real-time weather, multi-day forecasts, historical analysis, and grid carbon intensity. Pay-per-query for climate intelligence.
 
-## Authentication
+**API Docs:** https://climate-api.example.com/docs
 
-All paid endpoints require a Mainlayer API key:
+## Pricing
 
-```
-Authorization: Bearer <your_mainlayer_api_key>
-```
+| Endpoint | Cost | Use Case |
+|----------|------|----------|
+| `/weather/current` | $0.001 | Current conditions by city |
+| `/weather/forecast` | $0.003 | 7-day forecast with hourly detail |
+| `/weather/history` | $0.005 | Historical data (30+ years) |
+| `/climate/monthly` | $0.002 | Monthly climate normals + averages |
+| `/alerts` | $0.001 | Active weather alerts by region |
+| `/carbon/footprint` | $0.002 | Grid carbon intensity (CO2/kWh) |
+| `/health` | FREE | Health check |
 
-Get your API key at [mainlayer.fr](https://mainlayer.fr).
-
-## Quick Start
+## Agent Example: Weather & Climate Queries
 
 ```python
+from mainlayer import MainlayerClient
 import httpx
 
-headers = {"Authorization": "Bearer YOUR_API_KEY"}
+client = MainlayerClient(api_key="sk_test_...")
+token = client.get_access_token("climate-data-mainlayer")
+headers = {"Authorization": f"Bearer {token}"}
 
-# Get current weather
+# Current weather ($0.001)
 weather = httpx.get(
     "https://climate-api.example.com/weather/current",
     params={"city": "London"},
-    headers=headers,
+    headers=headers
 ).json()
+print(f"Temp: {weather['temperature_c']}°C")
 
-print(f"Temperature: {weather['data']['temperature_c']}°C")
-print(f"Condition: {weather['data']['condition']}")
+# 7-day forecast ($0.003)
+forecast = httpx.get(
+    "https://climate-api.example.com/weather/forecast",
+    params={"city": "London", "days": 7},
+    headers=headers
+).json()
 ```
 
-## Running Locally
+## Install & Run
 
 ```bash
 pip install -e ".[dev]"
 MAINLAYER_DEV_MODE=true uvicorn src.main:app --reload
-```
-
-Open [http://localhost:8000/docs](http://localhost:8000/docs) for the interactive API docs.
-
-## Development Mode
-
-Set `MAINLAYER_DEV_MODE=true` to bypass payment validation during local development.
-
-## Running Tests
-
-```bash
 pytest tests/ -v
 ```
 
-## Examples
+## Environment Variables
 
-- [`examples/get_forecast.py`](examples/get_forecast.py) — Fetch weather forecasts
-- [`examples/historical_analysis.py`](examples/historical_analysis.py) — Analyse historical weather data
+```
+MAINLAYER_API_KEY      # Your Mainlayer API key
+MAINLAYER_DEV_MODE     # Set true to bypass payment (local dev)
+```
+
+📚 [Mainlayer Docs](https://docs.mainlayer.fr) | [mainlayer.fr](https://mainlayer.fr)
