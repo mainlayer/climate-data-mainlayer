@@ -5,7 +5,7 @@ Validates API keys against the Mainlayer platform and enforces per-endpoint
 pricing. Mainlayer is the payment rail for AI agents — think Stripe, but for
 machine-to-machine commerce.
 
-Base URL: https://api.mainlayer.xyz
+Base URL: https://api.mainlayer.fr
 Auth:     Authorization: Bearer <api_key>
 """
 
@@ -19,7 +19,7 @@ import httpx
 from fastapi import HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-MAINLAYER_API_URL = os.getenv("MAINLAYER_API_URL", "https://api.mainlayer.xyz")
+MAINLAYER_API_URL = os.getenv("MAINLAYER_API_URL", "https://api.mainlayer.fr")
 MAINLAYER_SERVICE_KEY = os.getenv("MAINLAYER_SERVICE_KEY", "")
 
 # Cache validated keys briefly to reduce latency on repeated calls.
